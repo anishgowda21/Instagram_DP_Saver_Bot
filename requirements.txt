@@ -1,0 +1,2 @@
+python-telegram-bot==13.0
+instaloader
