@@ -1,7 +1,7 @@
 ## Instagram DP Saver Bot
 ### A  telegram bot to get a anyone's Instagram DP
 ## Dependencies
--instaloader\
+- instaloader\
   ```pip3 install instaloader```
   
 - python telegram wrapper\
