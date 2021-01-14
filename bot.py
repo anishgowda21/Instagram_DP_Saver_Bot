@@ -30,7 +30,7 @@ def help_msg(update, context):
 
 def contact(update, context):
     keyboard = [[InlineKeyboardButton(
-        "Contact", url=<your contact url>)], ]
+        "Contact", url="<your contact url>")], ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
