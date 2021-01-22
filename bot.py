@@ -17,9 +17,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+def acc_type(val):
+    if(val):
+        return "🔒Private🔒"
+    else:
+        return "🔓Public🔓"
+
+
 # Start the Bot
-
-
 def start(update, context):
     update.message.reply_html(welcome_msg)
 
@@ -36,22 +42,24 @@ def contact(update, context):
 
     update.message.reply_text('Contact The Maker:', reply_markup=reply_markup)
 
-# get teh username and send the DP
+# Get the username and send the DP
 
 
 def username(update, context):
     msg = update.message.reply_text("Downloading...")
     query = update.message.text
     chat_id = update.message.chat_id
-    # try:
-    dp = Profile.from_username(
-        L.context, query).profile_pic_url
-    context.bot.send_photo(
-        chat_id=chat_id, photo=dp, caption="Thank You For Using The bot 😀😀")
-    msg.edit_text("finished.")
-    time.sleep(5)
-    # except Exception:
-    #     msg.edit_text("Try Again 😕😕 Check the username correctly")
+    try:
+        user = Profile.from_username(L.context, query)
+        caption_msg = f'''📛*Name*📛: {user.full_name} \n😁*Followers*😁: {user.followers} \n🤩*Following*🤩: {user.followees}\
+         \n🧐*Account Type*🧐: {acc_type(user.is_private)} \n\nThank You For Using The bot 😀😀'''
+        context.bot.send_photo(
+            chat_id=chat_id, photo=user.profile_pic_url,
+            caption=caption_msg, parse_mode='MARKDOWN')
+        msg.edit_text("finished.")
+        time.sleep(5)
+    except Exception:
+        msg.edit_text("Try again 😕😕 Check the username correctly")
 
 
 def error(update, context):
@@ -74,8 +82,7 @@ def main():
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
     updater.bot.set_webhook(
         "https://<your app name>.herokuapp.com/" + TOKEN)
-    # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
-    # SIGTERM or  SIGABRT
+
     updater.idle()
 
 
