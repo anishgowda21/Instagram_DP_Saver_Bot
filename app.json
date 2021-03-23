@@ -1,0 +1,6 @@
+{
+    "name" : "Instagram DP Saver Bot",
+    "description" : "Simple telegram bot to get anyones instagram DP",
+    "repository" : "https://github.com/anishgowda21/Instagram_DP_Saver_Bot",
+    "keywords" : ["instagram" , "telegram" , "telegram bot"]
+}
