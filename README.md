@@ -17,8 +17,4 @@
 
 - Or just send anyone's Instagram username to get their DP.
 
-## You can deploy the bot yourself here
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https://github.com/anishgowda21/Instagram_DP_Saver_Bot)
-
 ## Visit my bot [Instagram DP Saver Bot](https://telegram.dog/insta_dp_saver_bot)
