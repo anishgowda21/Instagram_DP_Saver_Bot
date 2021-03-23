@@ -21,4 +21,8 @@
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https://github.com/anishgowda21/Instagram_DP_Saver_Bot)
 
+## Watch the video here
+
+<a href = "https://youtu.be/lLRP9j_VizM"><img src="https://raw.githubusercontent.com/anishgowda21/SVG_for_README/main/youtube-minimal-icon-1.svg"></a>
+
 ## Visit my bot [Instagram DP Saver Bot](https://telegram.dog/insta_dp_saver_bot)
