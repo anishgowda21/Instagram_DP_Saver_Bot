@@ -32,10 +32,10 @@ def get_username(url):
                 data = data.split("?")
                 return data[0]
             except Exception:
-                return "this guys are insane broooo"
+                return "incorrect format"
         return data
     except Exception:
-        return "this guys are insane broooo"
+        return "incorrect format"
 
 
 ratingkey = [[InlineKeyboardButton(
