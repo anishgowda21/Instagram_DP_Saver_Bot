@@ -1,20 +1,24 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext, MessageHandler, Filters, commandhandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import os
+from traceback import format_exc
 from instaloader import Instaloader, Profile
 import time
-
+from consts import *
+import re
 
 '''Coded by Anish Gowda 😃😃😃😃'''
+
+
 L = Instaloader()
 TOKEN = os.getenv("BOT_TOKEN")
 APP_NAME = os.getenv("APP_NAME")
 TELEGRAM_USERNAME = os.getenv("TELEGRAM_USERNAME")
 
-welcome_msg = '''<b>Welcome To the Bot</b>🖐🖐
- <i>Send me anyones instagram username to get their DP</i>
- ex : <b>virat.kohli</b> , <b>thenameisyash</b> etc'''
+mediaregpat = r"(https?:\/\/(?:www\.)?instagram\.com\/(?:p|reel|tv)\/([^\/?#&\n]+)).*"
+proregpat = r"(https?:\/\/(?:www\.)?instagram\.com\/([a-z1-9_\.?=]+)).*"
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -22,23 +26,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def acc_type(val):
-    if(val):
-        return "🔒Private🔒"
-    else:
-        return "🔓Public🔓"
-
-# Start the Bot
-
-
 def start(update, context):
     id = update.message.chat_id
     name = update.message.from_user['username']
-    update.message.reply_html(welcome_msg)
+    update.message.reply_html(welcome_msg())
 
 
 def help_msg(update, context):
-    update.message.reply_text("Nothing to help ,This is way to simple 😂😂")
+    update.message.reply_text("Send Any instagram users username(without @) or their profile url to get their profile pricture")
 
 
 def contact(update, context):
@@ -53,20 +48,32 @@ def contact(update, context):
 
 
 def username(update, context):
-    msg = update.message.reply_text("Downloading...")
     query = update.message.text
-    chat_id = update.message.chat_id
-    try:
-        user = Profile.from_username(L.context, query)
-        caption_msg = f'''📛*Name*📛: {user.full_name} \n😁*Followers*😁: {user.followers} \n🤩*Following*🤩: {user.followees}\
-         \n🧐*Account Type*🧐: {acc_type(user.is_private)} \n\nThank You For Using The bot 😀😀'''
-        context.bot.send_photo(
-            chat_id=chat_id, photo=user.profile_pic_url,
-            caption=caption_msg, parse_mode='MARKDOWN')
-        msg.edit_text("finished.")
-        time.sleep(5)
-    except Exception:
-        msg.edit_text("Try again 😕😕 Check the username correctly")
+
+    if not re.compile(mediaregpat).search(query):
+        msg = update.message.reply_text("Downloading...")
+        if re.compile(proregpat).search(query):
+            query = get_username(query)
+        chat_id = update.message.chat_id
+        try:
+            user = Profile.from_username(L.context, query)
+            caption_msg = create_caption(user)
+            context.bot.send_photo(
+                chat_id=chat_id, photo=user.profile_pic_url,
+                caption=caption_msg, parse_mode='MarkdownV2')
+            update.message.reply_text("Can You support me by rating this bot 😃",
+                                      reply_markup=InlineKeyboardMarkup(ratingkey))
+            msg.edit_text("finished.")
+            time.sleep(5)
+        except Exception as e:
+            print(format_exc())
+            msg.edit_text("Try again 😕😕 Check the username correctly")
+    else:
+        update.message.reply_html("This bot only supports downloading of Profile picture please do not send media url.")
+
+
+def source(update, context):
+    update.message.reply_text("You can get the source code of this bot here \n\n https://github.com/anishgowda21/Instagram_DP_Saver_Bot")
 
 
 def error(update, context):
@@ -75,19 +82,24 @@ def error(update, context):
 
 
 def main():
-
-    updater = Updater(TOKEN, use_context=True)
+    # Create the Updater and pass it your bot's token.
+    # Make sure to set use_context=True to use the new context based callbacks
+    # Post version 12 this will no longer be necessary
+    updater = Updater(
+        TOKEN, use_context=True)
     PORT = int(os.environ.get('PORT', '8443'))
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_msg))
     dp.add_handler(CommandHandler("contact", contact))
-    dp.add_handler(MessageHandler(Filters.text, username))
+    dp.add_handler(CommandHandler("source", source))
+    dp.add_handler(MessageHandler(Filters.text, username, run_async=True))
     # log all errors
     dp.add_error_handler(error)
     # Start the Bot
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN,
-                          webhook_url=f"https://{APP_NAME}.herokuapp.com/" + TOKEN)
+
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN,webhook_url=f"https://{APP_NAME}.herokuapp.com/" + TOKEN, drop_pending_updates=True)
+    #updater.start_polling()
     updater.idle()
 
 
